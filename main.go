@@ -32,8 +32,6 @@ var localList = []string{
 	"0.0.0.0",
 }
 
-var WhiteDomainList []string
-
 func GetList(list []string) []io.Reader {
 	bodys := make([]io.Reader, 0)
 	for _, l := range list {
@@ -62,11 +60,6 @@ func DetectPath() (string, error) {
 func formatter(original string) bool {
 	for _, l := range localList {
 		if l == original {
-			return false
-		}
-	}
-	for _, w := range WhiteDomainList {
-		if strings.EqualFold(original, w) {
 			return false
 		}
 	}
@@ -232,7 +225,7 @@ func main() {
 		log.Println(err)
 		return
 	}
-	err = GetDomainList(route, "newDomain.txt", domainList, params)
+	err = GetDomainList(route, "domain", domainList, params)
 	if err != nil {
 		log.Println(err)
 		return
