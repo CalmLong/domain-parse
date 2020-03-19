@@ -3,5 +3,4 @@ https://cdn.jsdelivr.net/gh/neoFelhz/neohosts@gh-pages/full/hosts
 https://mirror1.malwaredomains.com/files/justdomains
 https://sysctl.org/cameleon/hosts
 https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt
-https://hosts-file.net/ad_servers.txt
 https://raw.githubusercontent.com/privacy-protection-tools/anti-AD/master/anti-ad-domains.txt
