@@ -13,6 +13,8 @@
 例如将 [dnsmasq-list](https://github.com/felixonmars/dnsmasq-china-list/blob/master/accelerated-domains.china.conf) 中的域名去掉前缀 `server=/` 以及后缀 `/114.114.114.114` 
 或者替换为你想要的内容亦或者仅输出纯粹的域名
 
+其他详情可见[常见问题](https://github.com/CalmLong/domain-parse/issues/2#issue-585661994)
+
 ## 功能
 
 * 支持自定义域名前后缀
