@@ -6,7 +6,12 @@
 
 ## 应用场景
 
-例如将 `dnsmasq-list` 中的域名去掉前缀 `server=/` 以及后缀 `/114.114.114.114` 或者替换为其他的内容
+将现有域名格式化为目标工具所支持的格式
+
+**通常需要解析标准或者非标准的 `hosts` 域名列表才应是使用本工具的主要原因**
+
+例如将 [dnsmasq-list](https://github.com/felixonmars/dnsmasq-china-list/blob/master/accelerated-domains.china.conf) 中的域名去掉前缀 `server=/` 以及后缀 `/114.114.114.114` 
+或者替换为你想要的内容亦或者仅输出纯粹的域名
 
 ## 功能
 
@@ -15,38 +20,59 @@
 * 支持自动移除域名列表中的注释(不支持网页)
 * 支持识别 `http_proxy` 代理变量
 
+## 支持格式
+
+可被解析的域名格式：
+
+* hosts(标准或者非标准)
+* dnsmasq
+* adblock(基础)
+
+输出的格式：
+
+可以输出任意格式的域名
+
+> 只能为域名前后添加任意字符，不支持域名内添加字符；
+> 例如 `github.com` 不能被输出为 `git*hub.com`
+
 ## 参数
 
-* `-c` 指定一个 `.txt` 文本路径，里面应当包含域名列表的 URL，每个一行
+`-c` 指定一个 `.txt` 文本路径，里面应当包含域名列表的 URL，每个一行
 
-* `-p` 共四个参数，中间用英文的 `,` 隔开
+`-v` 输出常见应用程序所支持的格式
 
-`-p` 前两(0,1)个参数为子域名的前/后缀，后两个(2,3)为主域名的前后缀，
-四个参数均为必填，不需要添加内容则用 `""` 代替
+ * hosts
+ * dnsmasq
+ * v2ray
+ * adblock
+ * only(仅输出域名)
+ 
+`-e` 修改 `-v` 参数输出的默认值，仅支持 `dnsmasq` 和 `hosts`
+
+`-p` 自定义输出域名格式，中间用英文的 `,` 隔开
+
+> `-p` 前两(0,1)个参数为子域名的前/后缀，后两个(2,3)为主域名的前后缀，
+> 四个参数均为必填，不需要添加内容则用 `""` 代替
 
 ## 示例
 
-* 替换为 dnsmasq 支持的格式：
+* 输出自定义格式的域名；通等于 `-v` 中的 `dnsmasq`
 
 `./domain-parse -c=url.txt -p=server=/,/114.114.114.114,server=/,/114.114.114.114`
 
-* 替换为 V2Ray 支持的格式：
+* 输出 V2Ray 支持的格式：
 
-`./domain-parse -c=url.txt -p=full:,"",domain:,""`
+`./domain-parse -c=url.txt -v v2ray`
 
-* 替换为 AdGuardHome 支持的格式：
+* 指定 `dnsmasq` 解析域名的 IP
 
-> 由于命令行本身的原因，对于一些特殊的字符你需要使用 "" 括起来表示字符串
+`./domain-parse -c url.txt -v dnsmasq -e 119.29.29.29`
 
-`./domain-parse -c=url.txt -p="||,^,||,^"`
-
-* 替换为 hosts 支持的格式：
-
-`./domain-parse -c=url.txt -p="127.0.0.1 ,"",127.0.0.1 ,"""`
+输出结果为 `server=/example.com/119.29.29.29`
 
 * 仅输出域名
 
-`./domain-parse -c=url.txt -p="","","",""`
+`./domain-parse -c=url.txt -v only`
 
 ## 输出
 

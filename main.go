@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"crypto/tls"
 	"flag"
+	"fmt"
 	"io"
 	"log"
 	"net"
@@ -35,6 +36,7 @@ var localList = []string{
 func GetList(list []string) []io.Reader {
 	bodys := make([]io.Reader, 0)
 	for _, l := range list {
+		log.Println("getting", l)
 		resp, err := req.Get(l)
 		if err != nil {
 			panic(err)
@@ -102,7 +104,15 @@ func Parase(list map[string]struct{}, writer *bufio.Writer, params []string) {
 	}
 }
 
+func deleteStr(newOrg string, strs []string) string {
+	for _, s := range strs {
+		newOrg = strings.ReplaceAll(newOrg, s, "")
+	}
+	return newOrg
+}
+
 func Resolve(bodys []io.Reader, list map[string]struct{}) {
+	const j = '#'
 	for _, body := range bodys {
 		reader := bufio.NewReader(body)
 		for {
@@ -111,15 +121,15 @@ func Resolve(bodys []io.Reader, list map[string]struct{}) {
 				break
 			}
 			original := string(o)
-			// 第一个字符为 # 时跳过
-			if strings.IndexRune(original, '#') == 0 {
+			// 第一个字符为 # 或 ! 时跳过
+			if strings.IndexRune(original, j) == 0 || strings.IndexRune(original, '!') == 0 {
 				continue
 			}
 			// 为空行时跳过
 			if strings.TrimSpace(original) == "" {
 				continue
 			}
-			// 用于 https://hosts-file.net/ad_servers.txt
+			// 用于 https://hosts-file.net/ad_servers.txt 等中间包含特殊空格的
 			if strings.ContainsRune(original, '\t') {
 				original = strings.ReplaceAll(original, "\t", " ")
 			}
@@ -132,17 +142,29 @@ func Resolve(bodys []io.Reader, list map[string]struct{}) {
 			// 移除行中的空格
 			newOrg = strings.TrimSpace(newOrg)
 			// 再一次验证第一个字符为 # 时跳过
-			if strings.IndexRune(original, '#') == 0 {
+			if strings.IndexRune(original, j) == 0 {
 				continue
 			}
-			if strings.ContainsRune(newOrg, '#') {
-				newOrg = newOrg[:strings.IndexRune(newOrg, '#')]
+			if strings.ContainsRune(newOrg, j) {
+				newOrg = newOrg[:strings.IndexRune(newOrg, j)]
 			}
 			// dnsmasq-list
-			newOrg = strings.ReplaceAll(newOrg, "server=/", "")
-			newOrg = strings.ReplaceAll(newOrg, "/114.114.114.114", "")
+			newOrg = deleteStr(newOrg, []string{"server=/", "/114.114.114.114"})
 			if !formatter(newOrg) {
 				continue
+			}
+			// adblock
+			if strings.ContainsRune(newOrg, '^') {
+				// 子域名包含 * 的不会被解析
+				if strings.ContainsRune(newOrg, '*') {
+					continue
+				}
+				// 表达式不会被解析
+				if strings.Contains(newOrg, "/^") {
+					continue
+				}
+				// 基础白名单规则会被一同解析
+				newOrg = deleteStr(newOrg, []string{"||", "^", "@@"})
 			}
 			newOrg = strings.TrimSpace(newOrg)
 			// 检测是否有端口号，有则移除端口号
@@ -191,8 +213,49 @@ func transport() *http.Transport {
 	}
 }
 
+var vals = []string{
+	dnsmasq, v2ray, hosts, adblock, only,
+}
+
+const (
+	dnsmasq = "dnsmasq"
+	v2ray   = "v2ray"
+	hosts   = "hosts"
+	adblock = "adblock"
+	only    = "only"
+)
+
+func domainFormat(value, exp string) []string {
+	vals := make([]string, 0)
+	switch value {
+	case dnsmasq:
+		v := "/114.114.114.114"
+		if exp != "" {
+			v = "/" + exp
+		}
+		vals = append(vals, "server=/", v, "server=/", v)
+	case v2ray:
+		vals = append(vals, "full:", "", "domain:", "")
+	case adblock:
+		vals = append(vals, "||", "^", "||", "^")
+	case hosts:
+		v := "0.0.0.0 "
+		if exp != "" {
+			v = exp + " "
+		}
+		vals = append(vals, v, "", v, "")
+	case only:
+		vals = append(vals, "", "", "", "")
+	default:
+		panic(fmt.Sprintln(value, " is an unsupported format"))
+	}
+	return vals
+}
+
 func main() {
 	file := flag.String("c", "", "")
+	val := flag.String("v", "", "")
+	exp := flag.String("e", "", "")
 	pars := flag.String("p", "", "")
 	flag.Parse()
 	params = make([]string, 0)
@@ -201,6 +264,13 @@ func main() {
 	if err != nil {
 		log.Println(err)
 		return
+	}
+	if strings.TrimSpace(*val) != "" {
+		for _, v := range vals {
+			if v == *val {
+				params = domainFormat(v, strings.TrimSpace(*exp))
+			}
+		}
 	}
 	body := bufio.NewReader(f)
 	domainList := make([]string, 0)
