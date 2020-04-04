@@ -214,7 +214,7 @@ func transport() *http.Transport {
 }
 
 var vals = []string{
-	dnsmasq, v2ray, hosts, adblock, only,
+	dnsmasq, v2ray, hosts, adblock, coredns, only,
 }
 
 const (
@@ -222,14 +222,17 @@ const (
 	v2ray   = "v2ray"
 	hosts   = "hosts"
 	adblock = "adblock"
+	coredns = "coredns"
 	only    = "only"
 )
+
+const dnsIP = "114.114.114.114"
 
 func domainFormat(value, exp string) []string {
 	vals := make([]string, 0)
 	switch value {
 	case dnsmasq:
-		v := "/114.114.114.114"
+		v := "/" + dnsIP
 		if exp != "" {
 			v = "/" + exp
 		}
@@ -244,6 +247,12 @@ func domainFormat(value, exp string) []string {
 			v = exp + " "
 		}
 		vals = append(vals, v, "", v, "")
+	case coredns:
+		v := " " + dnsIP
+		if exp != "" {
+			v = " " + exp
+		}
+		vals = append(vals, "forward ", v, "forward ", v)
 	case only:
 		vals = append(vals, "", "", "", "")
 	default:
@@ -253,10 +262,10 @@ func domainFormat(value, exp string) []string {
 }
 
 func main() {
-	file := flag.String("c", "", "")
-	val := flag.String("v", "", "")
-	exp := flag.String("e", "", "")
-	pars := flag.String("p", "", "")
+	file := flag.String("c", "url.txt", "")
+	val := flag.String("v", "", "dnsmasq\nv2ray\nhosts\nadblock\ncoredns\nonly")
+	exp := flag.String("e", "", "-v takes effect when\ndnsmasq\nhosts\ncoredns")
+	pars := flag.String("p", "", "customize")
 	flag.Parse()
 	params = make([]string, 0)
 	params = strings.Split(strings.TrimSpace(*pars), ",")
@@ -265,11 +274,16 @@ func main() {
 		log.Println(err)
 		return
 	}
-	if strings.TrimSpace(*val) != "" {
+	vl := strings.TrimSpace(*val)
+	if vl != "" {
 		for _, v := range vals {
 			if v == *val {
 				params = domainFormat(v, strings.TrimSpace(*exp))
 			}
+		}
+		if len(params) < 2 {
+			panic(fmt.Sprintln(vl, " is an unsupported format"))
+			return
 		}
 	}
 	body := bufio.NewReader(f)

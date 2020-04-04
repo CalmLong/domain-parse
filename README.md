@@ -33,7 +33,7 @@
 
 输出的格式：
 
-可以输出任意格式的域名
+可为域名前后添加任意内容
 
 > 只能为域名前后添加任意字符，不支持域名内添加字符；
 > 例如 `github.com` 不能被输出为 `git*hub.com`
@@ -48,6 +48,7 @@
  * dnsmasq
  * v2ray
  * adblock
+ * coredns
  * only(仅输出域名)
  
 `-e` 修改 `-v` 参数输出的默认值，仅支持 `dnsmasq` 和 `hosts`
