@@ -268,7 +268,7 @@ func main() {
 	pars := flag.String("p", "", "customize")
 	flag.Parse()
 	params = make([]string, 0)
-	params = strings.Split(strings.TrimSpace(*pars), ",")
+	params = strings.Split(strings.TrimSpace(*pars), ";")
 	f, err := os.Open(strings.TrimSpace(*file))
 	if err != nil {
 		log.Println(err)

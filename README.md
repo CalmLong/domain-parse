@@ -53,7 +53,7 @@
  
 `-e` 修改 `-v` 参数输出的默认值，仅支持 `dnsmasq` 和 `hosts`
 
-`-p` 自定义输出域名格式，中间用英文的 `,` 隔开
+`-p` 自定义输出域名格式，中间用英文的 `;` 隔开
 
 > `-p` 前两(0,1)个参数为子域名的前/后缀，后两个(2,3)为主域名的前后缀，
 > 四个参数均为必填，不需要添加内容则用 `""` 代替
@@ -62,7 +62,11 @@
 
 * 输出自定义格式的域名；通等于 `-v` 中的 `dnsmasq`
 
-`./domain-parse -c=url.txt -p=server=/,/114.114.114.114,server=/,/114.114.114.114`
+`./domain-parse -c=url.txt -p=server=/;/114.114.114.114;server=/;/114.114.114.114`
+
+* 输出适用于 Kitsunebi 
+
+`./domain-parse.exe -p "DOMAIN-SUFFIX,;,Reject";"DOMAIN-SUFFIX,;,Reject"`
 
 * 输出 V2Ray 支持的格式：
 
