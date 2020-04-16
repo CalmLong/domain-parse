@@ -66,7 +66,7 @@
 
 * 输出适用于 Kitsunebi 
 
-`./domain-parse.exe -p "DOMAIN-SUFFIX,;,Reject";"DOMAIN-SUFFIX,;,Reject"`
+`./domain-parse -p "DOMAIN-SUFFIX,;,Reject;DOMAIN-SUFFIX,;,Reject"`
 
 * 输出 V2Ray 支持的格式：
 
