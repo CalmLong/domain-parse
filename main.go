@@ -129,7 +129,7 @@ func Resolve(bodys []io.Reader, list map[string]struct{}) {
 			if strings.TrimSpace(original) == "" {
 				continue
 			}
-			// 用于 https://hosts-file.net/ad_servers.txt 等中间包含特殊空格的
+			// 用于中间包含特殊空格的
 			if strings.ContainsRune(original, '\t') {
 				original = strings.ReplaceAll(original, "\t", " ")
 			}
@@ -165,6 +165,15 @@ func Resolve(bodys []io.Reader, list map[string]struct{}) {
 				}
 				// 基础白名单规则会被一同解析
 				newOrg = deleteStr(newOrg, []string{"||", "^", "@@"})
+			}
+			// Surge
+			sg := len(strings.Split(newOrg, ","))
+			switch sg {
+			case 2, 3:
+				newOrg = newOrg[strings.IndexRune(newOrg, ',')+1:]
+				if sg == 3 {
+					newOrg = newOrg[:strings.IndexRune(newOrg, ',')]
+				}
 			}
 			newOrg = strings.TrimSpace(newOrg)
 			// 检测是否有端口号，有则移除端口号
@@ -214,7 +223,7 @@ func transport() *http.Transport {
 }
 
 var vals = []string{
-	dnsmasq, v2ray, hosts, adblock, coredns, only,
+	dnsmasq, v2ray, hosts, adblock, coredns, surge, only,
 }
 
 const (
@@ -223,6 +232,7 @@ const (
 	hosts   = "hosts"
 	adblock = "adblock"
 	coredns = "coredns"
+	surge   = "surge"
 	only    = "only"
 )
 
@@ -253,6 +263,12 @@ func domainFormat(value, exp string) []string {
 			v = " " + exp
 		}
 		vals = append(vals, "forward ", v, "forward ", v)
+	case surge:
+		v := ",REJECT"
+		if exp != "" {
+			v = "," + exp
+		}
+		vals = append(vals, "DOMAIN-SUFFIX,", v, "DOMAIN-SUFFIX,", v)
 	case only:
 		vals = append(vals, "", "", "", "")
 	default:
@@ -263,8 +279,8 @@ func domainFormat(value, exp string) []string {
 
 func main() {
 	file := flag.String("c", "url.txt", "")
-	val := flag.String("v", "", "dnsmasq\nv2ray\nhosts\nadblock\ncoredns\nonly")
-	exp := flag.String("e", "", "-v takes effect when\ndnsmasq\nhosts\ncoredns")
+	val := flag.String("v", "", "dnsmasq\nv2ray\nhosts\nadblock\ncoredns\nsurge\nonly")
+	exp := flag.String("e", "", "-v takes effect when\ndnsmasq\nhosts\ncoredns\nsurge")
 	pars := flag.String("p", "", "customize")
 	flag.Parse()
 	params = make([]string, 0)
