@@ -1,15 +1,12 @@
 # 域名列表解析
 
-**对现有的域名列表进行格式化**
-
 [点击这里](https://github.com/CalmLong/domain-parse/releases)下载最新版本
 
 ## 应用场景
 
 将现有域名格式化为目标工具所支持的格式
 
-例如将 `dnsmasq-list` 中的域名去掉前缀 `server=/` 以及后缀 `/114.114.114.114` 
-或者替换为你想要的内容亦或者仅输出纯粹的域名
+例如将 `dnsmasq-list` 中的域名转换为其他工具支持的格式
 
 其他详情可见[常见问题](https://github.com/CalmLong/domain-parse/issues/2#issue-585661994)
 
@@ -23,8 +20,6 @@
 
 ## 支持格式
 
-可被解析的域名格式：
-
 * Hosts
 * dnsmasq
 * Adblock
@@ -33,17 +28,24 @@
 
 ## 参数
 
-`-c` 指定一个 `.txt` 文本路径；里面应当包含域名列表的 URL，每个一行；默认加载同级目录中的 `url.txt`
+`-c` 一个 `.txt` 文本路径；里面应当包含域名列表的 URL，每个一行；参数不存在时默认加载同级目录中的 `url.txt`
 
-`-v` 输出常见应用程序所支持的格式
+`-v` 输出常见应用程序所支持的格式，并设定了一些默认值
 
- * `hosts` 默认 IP 为 `0.0.0.0`
- * `dnsmasq` 默认 DNS 地址为 `114.114.114.114`
+ * `hosts`
+ * `dnsmasq`
  * `v2ray`
  * `adblock`
- * `coredns` 默认 DNS 地址为 `114.114.114.114`
+ * `coredns`
+ * `surge`
+ * `only`
+ 
+ 其中
+  
+ * `dnsmasq` 和 `coredns` DNS 地址为 `114.114.114.114`
+ * `hosts` 默认 IP 为 `0.0.0.0`
  * `surge` 默认规则为 `REJECT`
- * `only` 仅输出域名
+ * `only` 特殊选项，表示仅输出域名
  
 `-e` 修改 `-v` 参数输出的默认值，支持
 
@@ -62,7 +64,7 @@
 
 * 输出自定义格式的域名；通等于 `-v` 中的 `dnsmasq`
 
-`./domain-parse -c=url.txt -p=server=/;/114.114.114.114;server=/;/114.114.114.114`
+`./domain-parse -c=url.txt -p server=/;/114.114.114.114;server=/;/114.114.114.114`
 
 * 输出适用于 Surge 等工具支持的格式
 
@@ -70,26 +72,22 @@
 
 * 输出 V2Ray 支持的格式
 
-`./domain-parse -c=url.txt -v v2ray`
+`./domain-parse -v v2ray`
 
 * 指定 `dnsmasq` 解析域名的 IP
 
-`./domain-parse -c url.txt -v dnsmasq -e 119.29.29.29`
+`./domain-parse -v dnsmasq -e 119.29.29.29`
 
-输出结果为 `server=/example.com/119.29.29.29`
+> 输出结果为 `server=/example.com/119.29.29.29`
 
 * 仅输出域名
 
-`./domain-parse -c=url.txt -v only`
+`./domain-parse -v only`
 
 ## 输出
 
-工具输出一个无后缀名且为 `domain` 的文本，可用记事本等文本编辑器打开
-
-## 贡献
-
-遇到任何问题可以提交[issues](https://github.com/CalmLong/domain-parse/issues)
+转换完成后输出一个无后缀名且为 `domain` 的文本，可用记事本等文本编辑器打开
 
 ## 其他
 
-`url.txt` 中的域名仅供测试(演示)使用，可能需要代理才可连接，与本项目无关。如有侵权可联系删除
+`url.txt` 中的域名仅供测试(演示)使用，可能需要代理才可连接，与本项目无关
