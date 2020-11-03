@@ -231,7 +231,7 @@ func transport() *http.Transport {
 }
 
 var vTools = []string{
-	dnsmasq, v2ray, hosts, adblock, coredns, surge, only,
+	dnsmasq, v2ray, hosts, adblock, surge, only,
 }
 
 const (
@@ -239,7 +239,6 @@ const (
 	v2ray   = "v2ray"
 	hosts   = "hosts"
 	adblock = "adblock"
-	coredns = "coredns"
 	surge   = "surge"
 	only    = "only"
 )
@@ -265,12 +264,6 @@ func domainFormat(value, exp string) []string {
 			v = exp + " "
 		}
 		vParams = append(vParams, v, "", v, "")
-	case coredns:
-		v := " " + dnsIP
-		if exp != "" {
-			v = " " + exp
-		}
-		vParams = append(vParams, "forward ", v, "forward ", v)
 	case surge:
 		v := ",REJECT"
 		if exp != "" {
