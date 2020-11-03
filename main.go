@@ -34,16 +34,16 @@ var localList = []string{
 }
 
 func GetList(list []string) []io.Reader {
-	bodys := make([]io.Reader, 0)
+	rs := make([]io.Reader, 0)
 	for _, l := range list {
 		log.Println("getting", l)
 		resp, err := req.Get(l)
 		if err != nil {
 			panic(err)
 		}
-		bodys = append(bodys, resp.Body)
+		rs = append(rs, resp.Body)
 	}
-	return bodys
+	return rs
 }
 
 func DetectPath() (string, error) {
@@ -68,7 +68,7 @@ func formatter(original string) bool {
 	return true
 }
 
-func Parase(list map[string]struct{}, writer *bufio.Writer, params []string) {
+func Parse(list map[string]struct{}, writer *bufio.Writer, params []string) {
 	domainSuffix := []string{".com.cn", ".net.cn", ".org.cn", ".gov.cn"}
 	domains := make([]string, 0)
 	fulls := make([]string, 0)
@@ -81,8 +81,8 @@ func Parase(list map[string]struct{}, writer *bufio.Writer, params []string) {
 			domains = append(domains, k)
 		case 2:
 			fulls = append(fulls, k)
-			for _, sufix := range domainSuffix {
-				if strings.Contains(k, sufix) {
+			for _, suffix := range domainSuffix {
+				if strings.Contains(k, suffix) {
 					domains = append(domains, k)
 					break
 				}
@@ -104,16 +104,16 @@ func Parase(list map[string]struct{}, writer *bufio.Writer, params []string) {
 	}
 }
 
-func deleteStr(newOrg string, strs []string) string {
-	for _, s := range strs {
+func deleteStr(newOrg string, str []string) string {
+	for _, s := range str {
 		newOrg = strings.ReplaceAll(newOrg, s, "")
 	}
 	return newOrg
 }
 
-func Resolve(bodys []io.Reader, list map[string]struct{}) {
+func Resolve(reader []io.Reader, list map[string]struct{}) {
 	const j = '#'
-	for _, body := range bodys {
+	for _, body := range reader {
 		reader := bufio.NewReader(body)
 		for {
 			o, _, c := reader.ReadLine()
@@ -198,16 +198,16 @@ func Resolve(bodys []io.Reader, list map[string]struct{}) {
 	}
 }
 
-func GetDomainList(path, suffix string, domans, params []string) error {
+func GetDomainList(path, suffix string, domain, params []string) error {
 	file, err := os.Create(path + "/" + suffix)
 	if err != nil {
 		return err
 	}
 	domainList := make(map[string]struct{}, 0)
-	Resolve(GetList(domans), domainList)
+	Resolve(GetList(domain), domainList)
 	log.Printf("%s total: %d", suffix, len(domainList))
 	bw := bufio.NewWriter(file)
-	Parase(domainList, bw, params)
+	Parse(domainList, bw, params)
 	_ = bw.Flush()
 	return file.Close()
 }
@@ -230,7 +230,7 @@ func transport() *http.Transport {
 	}
 }
 
-var vals = []string{
+var vTools = []string{
 	dnsmasq, v2ray, hosts, adblock, coredns, surge, only,
 }
 
@@ -247,42 +247,42 @@ const (
 const dnsIP = "114.114.114.114"
 
 func domainFormat(value, exp string) []string {
-	vals := make([]string, 0)
+	vParams := make([]string, 0)
 	switch value {
 	case dnsmasq:
 		v := "/" + dnsIP
 		if exp != "" {
 			v = "/" + exp
 		}
-		vals = append(vals, "server=/", v, "server=/", v)
+		vParams = append(vParams, "server=/", v, "server=/", v)
 	case v2ray:
-		vals = append(vals, "full:", "", "domain:", "")
+		vParams = append(vParams, "full:", "", "domain:", "")
 	case adblock:
-		vals = append(vals, "||", "^", "||", "^")
+		vParams = append(vParams, "||", "^", "||", "^")
 	case hosts:
 		v := "0.0.0.0 "
 		if exp != "" {
 			v = exp + " "
 		}
-		vals = append(vals, v, "", v, "")
+		vParams = append(vParams, v, "", v, "")
 	case coredns:
 		v := " " + dnsIP
 		if exp != "" {
 			v = " " + exp
 		}
-		vals = append(vals, "forward ", v, "forward ", v)
+		vParams = append(vParams, "forward ", v, "forward ", v)
 	case surge:
 		v := ",REJECT"
 		if exp != "" {
 			v = "," + exp
 		}
-		vals = append(vals, "DOMAIN-SUFFIX,", v, "DOMAIN-SUFFIX,", v)
+		vParams = append(vParams, "DOMAIN-SUFFIX,", v, "DOMAIN-SUFFIX,", v)
 	case only:
-		vals = append(vals, "", "", "", "")
+		vParams = append(vParams, "", "", "", "")
 	default:
 		panic(fmt.Sprintln(value, " is an unsupported format"))
 	}
-	return vals
+	return vParams
 }
 
 func main() {
@@ -300,7 +300,7 @@ func main() {
 	}
 	vl := strings.TrimSpace(*val)
 	if vl != "" {
-		for _, v := range vals {
+		for _, v := range vTools {
 			if v == *val {
 				params = domainFormat(v, strings.TrimSpace(*exp))
 			}
