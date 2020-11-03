@@ -18,6 +18,13 @@ import (
 
 var params []string
 
+var domainSuffix = []string{
+	".com.cn", ".net.cn", ".org.cn", ".gov.cn", ".ah.cn", ".bj.cn", ".cq.cn", ".fj.cn",
+	".gd.cn", ".gs.cn", ".gx.cn", ".gz.cn", ".ha.cn", ".hb.cn", ".he.cn", ".hi.cn", ".hk.cn", ".hn.cn", ".jl.cn",
+	".js.cn", ".jx.cn", ".ln.cn", ".mo.cn", ".nm.cn", ".nx.cn", ".qh.cn", ".sc.cn", ".sd.cn", ".sh.cn", ".sn.cn",
+	".sx.cn", ".tj.cn", ".tw.cn", ".xj.cn", ".yn.cn", ".zj.cn",
+}
+
 var localList = []string{
 	"localhost",
 	"ip6-localhost",
@@ -69,7 +76,6 @@ func formatter(original string) bool {
 }
 
 func Parse(list map[string]struct{}, writer *bufio.Writer, params []string) {
-	domainSuffix := []string{".com.cn", ".net.cn", ".org.cn", ".gov.cn"}
 	domains := make([]string, 0)
 	fulls := make([]string, 0)
 	for k, _ := range list {
