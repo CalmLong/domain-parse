@@ -182,10 +182,18 @@ func Resolve(bodys []io.Reader, list map[string]struct{}) {
 			}
 			urlStr, err := url.Parse(newOrg)
 			if err != nil {
-				log.Println(newOrg)
+				log.Println("parse failed: ", newOrg)
 				continue
 			}
-			list[urlStr.String()] = struct{}{}
+			urlString := urlStr.String()
+			// 如果为 IP 则跳过
+			if err := net.ParseIP(urlString); err != nil {
+				continue
+			}
+			if strings.IndexRune(urlString, '.') == 0 {
+				urlString = urlString[1:]
+			}
+			list[urlString] = struct{}{}
 		}
 	}
 }
