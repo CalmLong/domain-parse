@@ -20,11 +20,11 @@
 
 ## 支持格式
 
-* Hosts
+* hosts
 * dnsmasq
-* Adblock
-* Pi-Hole
-* Surge
+* adblock
+* pi-Hole
+* surge
 
 ## 参数
 
@@ -36,7 +36,6 @@
  * `dnsmasq`
  * `v2ray`
  * `adblock`
- * `coredns`
  * `surge`
  * `only`
  
@@ -51,20 +50,19 @@
 
 * `hosts`
 * `dnsmasq`
-* `coredns`
 * `surge`
 
 `-p` 自定义输出域名格式
 
 > 前两个参数(0,1)为子域名的前/后缀，后两个参数(2,3)为主域名的前后缀；
 > 中间用英文的 `;` 隔开;
-> 四个参数均为必填，不需要添加内容则用 `""` 代替
+> 四个参数均为必填，不需要添加内容只写 `;` 即可
 
 ## 示例
 
 * 输出自定义格式的域名；通等于 `-v` 中的 `dnsmasq`
 
-`./domain-parse -c=url.txt -p server=/;/114.114.114.114;server=/;/114.114.114.114`
+`./domain-parse -c=url.txt -p 'server=/;/114.114.114.114;server=/;/114.114.114.114'`
 
 * 输出适用于 Surge 等工具支持的格式
 
@@ -83,6 +81,8 @@
 * 仅输出域名
 
 `./domain-parse -v only`
+
+等同于 `./domain-parse -p ;;;;`
 
 ## 输出
 
