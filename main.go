@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -53,17 +54,13 @@ func GetList(list []string) []io.Reader {
 	return rs
 }
 
-func DetectPath() (string, error) {
+func detectPath() (string, error) {
 	str, err := os.Getwd()
 	if err != nil {
 		return "", err
 	}
-	dir := str + "/"
-	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
-		return "", err
-	}
-	dir = strings.Replace(dir, "\\", "/", -1)
-	return dir, nil
+	dir := filepath.Join(str)
+	return dir, os.MkdirAll(dir, os.ModePerm)
 }
 
 func formatter(original string) bool {
@@ -327,7 +324,7 @@ func main() {
 		}
 		domainList = append(domainList, u.String())
 	}
-	route, err := DetectPath()
+	route, err := detectPath()
 	if err != nil {
 		log.Println(err)
 		return
