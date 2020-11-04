@@ -4,3 +4,4 @@ https://mirror1.malwaredomains.com/files/justdomains
 https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt
 https://raw.githubusercontent.com/privacy-protection-tools/anti-AD/master/anti-ad-domains.txt
 https://raw.githubusercontent.com/privacy-protection-tools/anti-AD/master/anti-ad-surge.txt
+https://raw.githubusercontent.com/v2fly/domain-list-community/release/cn.txt

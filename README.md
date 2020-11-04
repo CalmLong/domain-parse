@@ -25,6 +25,7 @@
 * adblock
 * pi-Hole
 * surge
+* V2Ray
 
 ## 参数
 
@@ -41,7 +42,7 @@
  
  其中
   
- * `dnsmasq`地址为 `114.114.114.114`
+ * `dnsmasq` 地址为 `114.114.114.114`
  * `hosts` 默认 IP 为 `0.0.0.0`
  * `surge` 默认规则为 `REJECT`
  * `only` 特殊选项，表示仅输出域名

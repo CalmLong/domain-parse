@@ -179,6 +179,8 @@ func Resolve(reader []io.Reader, list map[string]struct{}) {
 				}
 			}
 			newOrg = strings.TrimSpace(newOrg)
+			// V2Ray
+			newOrg = deleteStr(newOrg, []string{"domain:", "full:", ":@ads"})
 			// 检测是否有端口号，有则移除端口号
 			if strings.ContainsRune(newOrg, ':') {
 				newOrg = newOrg[:strings.IndexRune(newOrg, ':')]
